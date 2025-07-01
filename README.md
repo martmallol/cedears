@@ -52,10 +52,38 @@
 2. Sign up for a free API key
 3. Add to your `.env.local` file
 
+#### InvertirOnline (IOL) API (Required for Argentine Market Data)
+1. Visit [IOL Developers](https://developers.invertironline.com/)
+2. Create an account and obtain your API credentials
+3. Get your client credentials from the IOL Developer Portal
+4. Add to your `.env.local` file
+
+**IOL API Features:**
+- Real-time market data for Argentine stocks, CEDEARs, and bonds
+- Portfolio management and trading capabilities
+- Historical data and market statistics
+- Low latency data feed for professional trading
+
+**Authentication Flow:**
+1. **Client Credentials**: Obtain from IOL Developer Portal
+2. **Access Token**: Use OAuth 2.0 flow to get bearer token
+3. **API Calls**: Include bearer token in Authorization header
+
+**Rate Limits:**
+- Production: Up to 1000 requests per minute
+- Sandbox: Up to 100 requests per minute
+
 #### Environment Variables
 ```env
 # Required
 ALPHA_VANTAGE_API_KEY=your_api_key_here
+
+# IOL API Configuration
+IOL_CLIENT_ID=your_iol_client_id
+IOL_CLIENT_SECRET=your_iol_client_secret
+IOL_USERNAME=your_iol_username
+IOL_PASSWORD=your_iol_password
+IOL_BASE_URL=https://api.invertironline.com
 
 # Optional (for production)
 NEXT_PUBLIC_APP_URL=https://yourdomain.com
