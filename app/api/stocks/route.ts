@@ -1,131 +1,73 @@
 import { NextResponse } from "next/server"
 
-// Mock API for demonstration - replace with real API keys
-const ALPHA_VANTAGE_API_KEY = process.env.ALPHA_VANTAGE_API_KEY || "demo"
-
-interface StockQuote {
-  symbol: string
-  price: number
-  change: number
-  changePercent: number
-}
-
-// Simulate different broker spreads and commissions
-const brokerConfig = {
-  Fidelity: { commissionRate: 0, spreadMultiplier: 1.0001 },
-  "Charles Schwab": { commissionRate: 0, spreadMultiplier: 1.0002 },
-  "E*TRADE": { commissionRate: 0, spreadMultiplier: 1.0003 },
-  "TD Ameritrade": { commissionRate: 0, spreadMultiplier: 1.0002 },
-  "Interactive Brokers": { commissionRate: 1, spreadMultiplier: 1.0001 },
-  Robinhood: { commissionRate: 0, spreadMultiplier: 1.0005 },
-  Webull: { commissionRate: 0, spreadMultiplier: 1.0003 },
-}
-
-async function fetchStockPrice(symbol: string): Promise<StockQuote> {
+// Mock API endpoint - replace with actual Portfolio Personal API integration
+export async function GET() {
   try {
-    // Using Alpha Vantage API for real stock data
-    const response = await fetch(
-      `https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${symbol}&apikey=${ALPHA_VANTAGE_API_KEY}`,
-    )
+    // This is where you would integrate with the Portfolio Personal API
+    // const response = await fetch('https://clientapi_sandbox.portfoliopersonal.com/api/stocks', {
+    //   headers: {
+    //     'Authorization': 'Bearer YOUR_API_KEY',
+    //     'Content-Type': 'application/json'
+    //   }
+    // })
 
-    if (!response.ok) {
-      throw new Error("Failed to fetch stock data")
-    }
+    // Mock data for demonstration
+    const mockData = [
+      {
+        symbol: "GGAL",
+        name: "Grupo Galicia",
+        price: 285.5,
+        change: 12.3,
+        changePercent: 4.5,
+        volume: 1250000,
+        marketCap: 15600000000,
+        pe: 8.5,
+        dividend: 2.3,
+      },
+      {
+        symbol: "YPFD",
+        name: "YPF",
+        price: 18.75,
+        change: -0.85,
+        changePercent: -4.3,
+        volume: 890000,
+        marketCap: 7400000000,
+        pe: 12.2,
+        dividend: 1.8,
+      },
+      // Add more stocks as needed
+    ]
 
-    const data = await response.json()
-    const quote = data["Global Quote"]
+    // Calculate fear and greed scores based on various factors
+    const stocksWithFearGreed = mockData.map((stock) => {
+      // Simple fear/greed calculation based on price change, volume, and volatility
+      let score = 50 // neutral baseline
 
-    if (!quote || Object.keys(quote).length === 0) {
-      // Fallback to mock data if API limit reached or demo key
-      return getMockStockData(symbol)
-    }
+      // Price change impact (±30 points)
+      score += stock.changePercent * 3
 
-    return {
-      symbol: quote["01. symbol"],
-      price: Number.parseFloat(quote["05. price"]),
-      change: Number.parseFloat(quote["09. change"]),
-      changePercent: Number.parseFloat(quote["10. change percent"].replace("%", "")),
-    }
+      // Volume impact (±10 points)
+      const avgVolume = 1000000
+      const volumeRatio = stock.volume / avgVolume
+      score += (volumeRatio - 1) * 10
+
+      // PE ratio impact (±10 points)
+      if (stock.pe < 10)
+        score += 10 // undervalued = greed
+      else if (stock.pe > 20) score -= 10 // overvalued = fear
+
+      // Clamp between 0 and 100
+      score = Math.max(0, Math.min(100, score))
+
+      return {
+        ...stock,
+        fearGreedScore: Math.round(score),
+      }
+    })
+
+    return NextResponse.json(stocksWithFearGreed)
   } catch (error) {
     console.error("Error fetching stock data:", error)
-    return getMockStockData(symbol)
-  }
-}
-
-function getMockStockData(symbol: string): StockQuote {
-  const mockPrices: Record<string, number> = {
-    SPY: 445.23,
-    AAPL: 192.45,
-    TSLA: 248.75,
-    NVDA: 875.32,
-    MSFT: 419.65,
-    GOOGL: 138.21,
-    AMZN: 155.89,
-  }
-
-  const basePrice = mockPrices[symbol] || 100
-  const randomChange = (Math.random() - 0.5) * 10
-
-  return {
-    symbol,
-    price: basePrice + randomChange,
-    change: randomChange,
-    changePercent: (randomChange / basePrice) * 100,
-  }
-}
-
-export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url)
-  const symbols = searchParams.get("symbols")?.split(",") || ["SPY"]
-
-  try {
-    const stockData: Record<string, any> = {}
-
-    for (const symbol of symbols) {
-      const quote = await fetchStockPrice(symbol)
-
-      // Generate broker prices based on the real price
-      const brokers = Object.entries(brokerConfig).map(([name, config]) => {
-        const adjustedPrice = quote.price * config.spreadMultiplier
-        const spread = adjustedPrice - quote.price
-
-        return {
-          name,
-          price: Number.parseFloat(adjustedPrice.toFixed(2)),
-          commission: config.commissionRate,
-          spread: Number.parseFloat(spread.toFixed(3)),
-          lastUpdated: new Date().toISOString(),
-        }
-      })
-
-      stockData[symbol] = {
-        name: getStockName(symbol),
-        symbol: quote.symbol,
-        type: symbol.includes("ETF") || ["SPY", "QQQ", "IWM"].includes(symbol) ? "ETF" : "Stock",
-        currentPrice: quote.price,
-        change: quote.change,
-        changePercent: quote.changePercent,
-        brokers,
-        lastUpdated: new Date().toISOString(),
-      }
-    }
-
-    return NextResponse.json(stockData)
-  } catch (error) {
-    console.error("API Error:", error)
     return NextResponse.json({ error: "Failed to fetch stock data" }, { status: 500 })
   }
-}
-
-function getStockName(symbol: string): string {
-  const names: Record<string, string> = {
-    SPY: "SPDR S&P 500 ETF Trust",
-    AAPL: "Apple Inc.",
-    TSLA: "Tesla, Inc.",
-    NVDA: "NVIDIA Corporation",
-    MSFT: "Microsoft Corporation",
-    GOOGL: "Alphabet Inc.",
-    AMZN: "Amazon.com Inc.",
-  }
-  return names[symbol] || `${symbol} Corporation`
 }
