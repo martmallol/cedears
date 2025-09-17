@@ -19,20 +19,3 @@ export function getStockLogo(symbol: string): string | null {
   
   return `https://logo.clearbit.com/${website}`
 }
-
-/**
- * Get all available stock symbols with websites
- * @returns Array of stock symbols
- */
-export function getAvailableStockSymbols(): string[] {
-  return Object.keys(websites)
-}
-
-/**
- * Check if a stock symbol has a logo available
- * @param symbol - Stock symbol
- * @returns Boolean indicating if logo is available
- */
-export function hasStockLogo(symbol: string): boolean {
-  return symbol in websites
-} 

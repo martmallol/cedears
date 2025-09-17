@@ -29,13 +29,12 @@ export function StockList({ stocks }: StockListProps) {
     return "Extreme Greed"
   }
 
-  // Get color based on value (same as gauge)
   const getScoreColor = (val: number) => {
-    if (val < 20) return "#dc2626" // Red
-    if (val < 40) return "#ea580c" // Orange
-    if (val < 60) return "#eab308" // Yellow
-    if (val < 80) return "#22c55e" // Green
-    return "#059669" // Dark Green
+    if (val < 20) return "#dc2626"
+    if (val < 40) return "#ea580c"
+    if (val < 60) return "#eab308"
+    if (val < 80) return "#22c55e"
+    return "#059669"
   }
 
   return (
@@ -45,7 +44,6 @@ export function StockList({ stocks }: StockListProps) {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4 flex-1">
-                {/* Logo */}
                 <div className="flex-shrink-0">
                   {getStockLogo(stock.symbol) ? (
                     <img
@@ -53,7 +51,6 @@ export function StockList({ stocks }: StockListProps) {
                       alt={`${stock.symbol} logo`}
                       className="w-12 h-12 rounded-full object-contain bg-white border border-gray-200"
                       onError={(e) => {
-                        // Fallback to a placeholder if logo fails to load
                         e.currentTarget.style.display = 'none'
                       }}
                     />
