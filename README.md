@@ -1,266 +1,160 @@
-# 📈 cedears
+# Merval Fear & Greed Index
 
-## 🚀 Quick Start
+A real-time fear and greed index for the Argentine stock market (Merval) built with Next.js and integrated with the Portfolio Personal API.
+
+## Features
+
+- **Real-time Market Data**: Fetches live stock data from Portfolio Personal API
+- **Fear & Greed Calculation**: Advanced algorithm that considers price momentum, volume, volatility, and market cap
+- **Interactive Dashboard**: Beautiful UI with gauges, charts, and detailed stock information
+- **Authentication**: Secure API credential management
+- **Responsive Design**: Works on desktop and mobile devices
+
+## How It Works
+
+The Fear & Greed Index calculates market sentiment based on multiple factors:
+
+1. **Price Momentum** (40% weight): Recent price changes indicate market direction
+2. **Volume Factor** (20% weight): Trading volume shows market participation and conviction
+3. **Volatility Factor** (25% weight): Extreme price movements suggest fear or greed
+4. **Market Cap Factor** (15% weight): Larger companies provide stability context
+
+## Getting Started
 
 ### Prerequisites
 
 - Node.js 18+ 
-- npm or yarn
-- Alpha Vantage API key (free tier available)
+- Portfolio Personal account with API access
+- API credentials from Portfolio Personal
 
 ### Installation
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/yourusername/stock-price-comparison.git
-   cd stock-price-comparison
-   ```
-
-2. **Install dependencies**
-   ```bash
-   npm install
-   # or
-   yarn install
-   ```
-
-3. **Set up environment variables**
-   ```bash
-   cp .env.example .env.local
-   ```
-   
-   Add your API keys to `.env.local`:
-   ```env
-   ALPHA_VANTAGE_API_KEY=your_alpha_vantage_api_key_here
-   ```
-
-4. **Run the development server**
-   ```bash
-   npm run dev
-   # or
-   yarn dev
-   ```
-
-5. **Open your browser**
-   Navigate to [http://localhost:3000](http://localhost:3000)
-
-## 🔧 Configuration
-
-### API Keys Setup
-
-#### Alpha Vantage (Required for US Stocks)
-1. Visit [Alpha Vantage](https://www.alphavantage.co/support/#api-key)
-2. Sign up for a free API key
-3. Add to your `.env.local` file
-
-#### Environment Variables
-```env
-# Required
-ALPHA_VANTAGE_API_KEY=your_api_key_here
-
-# Optional (for production)
-NEXT_PUBLIC_APP_URL=https://yourdomain.com
+1. Clone the repository:
+```bash
+git clone <your-repo-url>
+cd cedears
 ```
 
-## 📁 Project Structure
+2. Install dependencies:
+```bash
+npm install
+# or
+pnpm install
+```
+
+3. Run the development server:
+```bash
+npm run dev
+# or
+pnpm dev
+```
+
+4. Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+### Getting Portfolio Personal API Credentials
+
+1. Log in to your Portfolio Personal account
+2. Navigate to "Gestiones" → "Gestión de servicio API"
+3. Activate the API service if not already activated
+4. Copy your credentials:
+   - Authorized Client
+   - Client Key
+   - API Key
+   - API Secret
+
+### Using the App
+
+1. **Authentication**: Enter your Portfolio Personal API credentials in the authentication form
+2. **View Market Data**: Once authenticated, the app will fetch real-time Merval stock data
+3. **Monitor Sentiment**: Watch the overall fear and greed index and individual stock scores
+4. **Refresh Data**: Click the refresh button to get the latest market data
+
+## API Integration
+
+The app integrates with the Portfolio Personal API to fetch:
+
+- Real-time stock prices and changes
+- Trading volume data
+- Market capitalization information
+- Historical data for analysis
+
+### API Endpoints Used
+
+- `/api/v1/MarketData/GetStockInfo/{symbol}` - Individual stock data
+- `/api/v1/MarketData/GetMarketData` - Multiple stocks data
+- `/api/v1/MarketData/GetSymbols` - Available stock symbols
+
+## Stock Coverage
+
+The app focuses on major Merval component stocks including:
+
+- **GGAL** - Grupo Financiero Galicia
+- **YPFD** - YPF
+- **PAMP** - Pampa Energía
+- **TXAR** - Ternium Argentina
+- **MIRG** - Mirgor
+- **ALUA** - Aluar
+- **BMA** - Banco Macro
+- **SUPV** - Supervielle
+- And more...
+
+## Technical Stack
+
+- **Frontend**: Next.js 14, React 18, TypeScript
+- **UI Components**: Radix UI, Tailwind CSS
+- **Charts**: Recharts
+- **API Integration**: Axios
+- **State Management**: React hooks
+
+## Project Structure
 
 ```
 ├── app/
-│   ├── api/                    # API routes
-│   │   ├── stocks/            # US stocks API endpoint
-│   │   ├── cedears/           # CEDEARs API endpoint
-│   │   └── bonds/             # Bonds API endpoint
-│   ├── globals.css            # Global styles
-│   ├── layout.tsx             # Root layout
-│   └── page.tsx               # Home page
+│   ├── api/
+│   │   ├── auth/          # Authentication endpoints
+│   │   └── stocks/        # Stock data endpoints
+│   ├── globals.css
+│   ├── layout.tsx
+│   └── page.tsx
 ├── components/
-│   ├── ui/                    # shadcn/ui components
-│   ├── stock-comparison.tsx   # Main comparison component
-│   ├── theme-toggle.tsx       # Theme switcher
-│   └── theme-provider.tsx     # Theme context
+│   ├── ui/                # Reusable UI components
+│   ├── auth-form.tsx      # Authentication form
+│   ├── fear-greed-dashboard.tsx
+│   ├── fear-greed-gauge.tsx
+│   ├── market-chart.tsx
+│   └── stock-list.tsx
 ├── lib/
-│   └── utils.ts               # Utility functions
-├── public/                    # Static assets
-└── README.md                  # This file
+│   ├── portfolio-personal-api.ts    # API service
+│   ├── fear-greed-calculator.ts     # Sentiment calculation
+│   └── utils.ts
+└── README.md
 ```
 
-## 🔌 API Endpoints
+## Security Notes
 
-### GET /api/stocks
-Fetches real-time US stock data with broker comparisons.
+- API credentials are stored locally in the browser's localStorage
+- Credentials are never shared or transmitted to third parties
+- The app uses the Portfolio Personal sandbox environment for testing
+- All API calls are made server-side to protect credentials
 
-**Parameters:**
-- `symbols`: Comma-separated stock symbols (e.g., "AAPL,TSLA,SPY")
+## Contributing
 
-**Response:**
-```json
-{
-  "AAPL": {
-    "name": "Apple Inc.",
-    "symbol": "AAPL",
-    "type": "Stock",
-    "currentPrice": 192.45,
-    "change": 2.34,
-    "changePercent": 1.23,
-    "brokers": [
-      {
-        "name": "Fidelity",
-        "price": 192.45,
-        "commission": 0,
-        "spread": 0.02,
-        "lastUpdated": "2024-01-15T10:30:00Z"
-      }
-    ],
-    "lastUpdated": "2024-01-15T10:30:00Z"
-  }
-}
-```
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Test thoroughly
+5. Submit a pull request
 
-### GET /api/cedears
-Fetches CEDEAR pricing with Argentine broker data.
+## License
 
-**Parameters:**
-- `symbols`: Comma-separated CEDEAR symbols (e.g., "AAPL.BA,TSLA.BA")
+This project is for educational and personal use. Please ensure you comply with Portfolio Personal's API terms of service.
 
-### GET /api/bonds
-Fetches government bond pricing data.
+## Support
 
-**Parameters:**
-- `symbols`: Comma-separated bond symbols (e.g., "AL30,GD30")
+For issues related to:
+- **Portfolio Personal API**: Contact Portfolio Personal support
+- **App functionality**: Create an issue in this repository
 
-## 🎨 Customization
+## Disclaimer
 
-### Adding New Brokers
-
-1. **Update API routes** (`app/api/[category]/route.ts`):
-   ```typescript
-   const brokerConfig = {
-     "New Broker": { 
-       commissionRate: 0.5, 
-       spreadMultiplier: 1.0002 
-     },
-     // ... existing brokers
-   }
-   ```
-
-2. **The UI will automatically update** to include the new broker in comparisons.
-
-### Adding New Instruments
-
-1. **Update available instruments** in `components/stock-comparison.tsx`:
-   ```typescript
-   const availableInstruments = {
-     stocks: {
-       "NEW": "New Stock Name",
-       // ... existing stocks
-     }
-   }
-   ```
-
-2. **Add pricing logic** in the corresponding API route.
-
-### Theme Customization
-
-The app uses Tailwind CSS with CSS variables for theming. Customize colors in `app/globals.css`:
-
-```css
-:root {
-  --primary: 220 14.3% 95.9%;
-  --primary-foreground: 220.9 39.3% 11%;
-  /* ... other variables */
-}
-```
-
-## 🧪 Testing
-
-### Running Tests
-```bash
-npm run test
-# or
-yarn test
-```
-
-### API Testing
-Test API endpoints directly:
-```bash
-curl "http://localhost:3000/api/stocks?symbols=AAPL,TSLA"
-```
-
-## 🚀 Deployment
-
-### Vercel (Recommended)
-1. **Connect your repository** to Vercel
-2. **Add environment variables** in Vercel dashboard
-3. **Deploy** - automatic deployments on push
-
-### Other Platforms
-The app can be deployed to any platform supporting Next.js:
-- Netlify
-- Railway
-- DigitalOcean App Platform
-- AWS Amplify
-
-### Build for Production
-```bash
-npm run build
-npm start
-```
-
-## 📊 Supported Assets
-
-### US Stocks & ETFs
-- **SPY** - SPDR S&P 500 ETF Trust
-- **AAPL** - Apple Inc.
-- **TSLA** - Tesla, Inc.
-- **NVDA** - NVIDIA Corporation
-- **MSFT** - Microsoft Corporation
-- **GOOGL** - Alphabet Inc.
-- **AMZN** - Amazon.com Inc.
-
-### CEDEARs (Argentine Market)
-- **AAPL.BA** - Apple Inc. CEDEAR (1:10 ratio)
-- **TSLA.BA** - Tesla Inc. CEDEAR (1:5 ratio)
-- **MSFT.BA** - Microsoft Corp. CEDEAR (1:8 ratio)
-- **NVDA.BA** - NVIDIA Corp. CEDEAR (1:20 ratio)
-
-### Government Bonds
-- **AL30** - Bonos República Argentina USD 2030
-- **GD30** - Bonos República Argentina USD 2030
-- **TX26** - Letras del Tesoro USD 2026
-- **AE38** - Bonos República Argentina USD 2038
-
-## 🔧 Troubleshooting
-
-### Common Issues
-
-#### API Rate Limits
-- **Problem**: "API call frequency exceeded"
-- **Solution**: Alpha Vantage free tier has 5 calls/minute limit
-- **Fix**: Upgrade to premium or implement caching
-
-#### Missing Environment Variables
-- **Problem**: App shows mock data only
-- **Solution**: Ensure `ALPHA_VANTAGE_API_KEY` is set correctly
-
-#### CORS Errors
-- **Problem**: Direct API calls failing
-- **Solution**: Use Next.js API routes (already implemented)
-
-### Debug Mode
-Enable debug logging:
-```bash
-DEBUG=true npm run dev
-```
-
-## 🙏 Acknowledgments
-
-- **[Alpha Vantage](https://www.alphavantage.co/)** - Real-time stock data API
-- **[shadcn/ui](https://ui.shadcn.com/)** - Beautiful UI components
-- **[Next.js](https://nextjs.org/)** - React framework
-- **[Tailwind CSS](https://tailwindcss.com/)** - Utility-first CSS framework
-- **[Lucide React](https://lucide.dev/)** - Beautiful icons
-
----
-
-**Built with ❤️ using Next.js 15 and modern web technologies**
-
-For more information, visit our [documentation](https://github.com/yourusername/stock-price-comparison/wiki) or [live demo](https://stock-comparison-demo.vercel.app).
+This tool is for informational purposes only and should not be considered as financial advice. Always consult with a qualified financial advisor before making investment decisions.
